@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Collection — AHANKARAKA</title>
+<meta name="description" content="Browse the collection — faceted by material, price and availability. Hand-finished temple & antique-gold jewellery.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="icon" type="image/svg+xml" href="assets/logo/brandmark.svg">
+</head>
+<body data-page="collection">
+<div id="ahx-header"></div>
+
+<section class="col-hero" id="colHero"></section>
+
+<div class="container">
+  <div class="crumb" id="colCrumb"></div>
+</div>
+<div class="col-intro reveal" id="colIntro"></div>
+
+<div class="container">
+  <div class="shop-wrap">
+    <aside class="facets" id="facetBox"></aside>
+    <main>
+      <div class="toolbar">
+        <span class="count" id="shopCount">—</span>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="position:relative">
+            <input id="shopSearch" placeholder="Search within…" style="padding:11px 16px;border:1px solid var(--line);background:var(--ivory);font-size:13px;min-width:200px">
+          </div>
+          <select id="sortSel">
+            <option value="featured">Sort · Curated</option>
+            <option value="low">Price · Low to High</option>
+            <option value="high">Price · High to Low</option>
+            <option value="name">Name · A–Z</option>
+          </select>
+        </div>
+      </div>
+      <div class="product-grid" id="shopGrid"></div>
+
+      <div class="editorial-break reveal">
+        <img src="assets/img/web/img_22.jpg" alt="">
+        <div class="eb"><h3>Made to order, made for you</h3><p>Most pieces are crafted after you order them — a few weeks of patience for an ornament that was never mass-made.</p></div>
+      </div>
+
+      <button class="btn btn-ghost load-more" id="loadMore">Load More Pieces</button>
+    </main>
+  </div>
+</div>
+
+<div id="ahx-footer"></div>
+<script src="assets/products.js"></script>
+<script src="assets/site.js"></script>
+</body>
+</html>

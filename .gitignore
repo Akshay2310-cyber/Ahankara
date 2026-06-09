@@ -1,0 +1,7 @@
+_qa/
+brand_src/
+_seed.html
+*.log
+.DS_Store
+node_modules/
+.vercel
