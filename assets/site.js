@@ -451,10 +451,11 @@
   function initProduct(){ var host=$("#pdp"); if(!host)return;
     var p=byId(param("sku"))||P[0]; var cm=colMeta(p.col);
     document.title=p.name+" — AHANKARAKA";
-    // gallery: real product photo (if any) first, then styled model/lifestyle shots
+    // gallery: all real product photos first (hero + extra angles), then styled lifestyle shots
+    var real=[]; if(p.ph){ real.push(PROD+p.sku+".jpg"); for(var j=2;j<=(p.np||1);j++) real.push(PROD+p.sku+"-"+j+".jpg"); }
     var idx=(S.all||[]).indexOf(p.img); var lifestyle=[];
     for(var k=0;k<3;k++){ lifestyle.push(WEB+(S.all||[])[(idx+1+k*5)%(S.all||[]).length]+".jpg"); }
-    var gal = p.ph ? [PROD+p.sku+".jpg"].concat(lifestyle) : [WEB+p.img+".jpg"].concat(lifestyle);
+    var gal = real.length ? real.concat(lifestyle).slice(0, Math.max(4, real.length)) : [WEB+p.img+".jpg"].concat(lifestyle);
     var onw=wish().indexOf(p.sku)>-1?" on":"";
     var mto=p.avail==="Made to Order";
     $("#pdpCrumb").innerHTML='<a href="index.html">Home</a><span>/</span><a href="collection.html?collection='+p.col+'">'+(cm?cm.name:"Collection")+'</a><span>/</span><b>'+p.name+'</b>';
