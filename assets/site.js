@@ -45,8 +45,8 @@
     cod:'<svg viewBox="0 0 46 30"><text x="23" y="19" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="8.5" fill="#3a282a">COD</text></svg>'
   };
   function payStrip(){
-    var order=["visa","mc","rupay","amex","upi","gpay","paytm","rzp","cod"];
-    return '<div class="pay-strip">'+order.map(function(k){return '<span class="pay-badge" title="'+k+'">'+PAY[k]+'</span>';}).join("")+'</div>';
+    var order=["visa","mastercard","rupay","amex","upi","gpay","phonepe","paytm","razorpay"];
+    return '<div class="pay-strip">'+order.map(function(k){return '<span class="pay-badge"><img src="assets/pay/'+k+'.svg" alt="'+k+'" loading="lazy"></span>';}).join("")+'</div>';
   }
 
   // ============================================================
@@ -152,9 +152,6 @@
           '<li>The Studio, Chennai</li>'+
           '<li>Mon–Sat · 10–8 IST</li></ul></div>'+
       '</div></div>'+
-      '<div class="pay-row"><div class="container">'+
-        '<span class="pl">Secure Payments</span>'+payStrip()+
-      '</div></div>'+
       '<div class="bottom"><div class="container">'+
         '<span>© <span id="yr">2026</span> AHANKARAKA. Crafted in India.</span>'+
         '<span><a href="legal.html">Privacy</a><a href="legal.html">Terms</a><a href="legal.html">Cookies</a></span>'+
@@ -199,6 +196,20 @@
         '<a href="support.html">Help</a>'+
         '<a href="wishlist.html">Wishlist</a>'+
       '</div>'+
+    '</div>'+
+    // floating WhatsApp + Ahankara concierge
+    '<div class="fab-stack">'+
+      '<a class="fab fab-wa" href="https://wa.me/919000000000?text='+encodeURIComponent("Hi AHANKARAKA, I'd love to know more about your jewellery.")+'" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><span class="fab-tip">Chat on WhatsApp</span>'+
+        '<svg viewBox="0 0 32 32" fill="#fff"><path d="M16 3C9 3 3.6 8.4 3.6 15.3c0 2.4.7 4.6 1.9 6.6L3 29l7.3-1.9c1.9 1 4 1.6 6 1.6h0c7 0 12.4-5.4 12.4-12.4C28.7 8.4 23 3 16 3zm0 22.6c-1.8 0-3.6-.5-5.1-1.4l-.4-.2-4.3 1.1 1.2-4.2-.3-.4a10 10 0 0 1-1.6-5.5C5.6 9.6 10.3 5 16 5s10.4 4.6 10.4 10.3S21.7 25.6 16 25.6zm5.7-7.7c-.3-.2-1.9-.9-2.1-1-.3-.1-.5-.2-.7.2s-.8 1-1 1.2c-.2.2-.4.2-.7.1-1.7-.9-2.9-1.6-4-3.6-.3-.5.3-.5.8-1.6.1-.2 0-.4 0-.5l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-1 1-1.3 2.3-.9 3.9.5 1.9 1.7 3.4 1.9 3.7.2.2 3.3 5.3 8.2 7.1 3 1.1 3.6.9 4.3.8.9-.1 2.4-1 2.7-1.9.3-.9.3-1.7.2-1.9-.1-.2-.3-.3-.6-.4z"/></svg></a>'+
+      '<button class="fab fab-chat" id="chatToggle" aria-label="Ask Ahankara"><span class="fab-tip">Ask Ahankara</span>'+
+        '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-12.7 7.4L3 21l2.1-5.3A8.5 8.5 0 1 1 21 11.5z"/><circle cx="8.5" cy="11.5" r="1.1"/><circle cx="12" cy="11.5" r="1.1"/><circle cx="15.5" cy="11.5" r="1.1"/></svg></button>'+
+    '</div>'+
+    '<div class="chat-panel" id="chatPanel">'+
+      '<div class="chat-head"><div class="av"><img src="assets/logo/brandmark-white.svg" alt=""></div>'+
+        '<div><b>Ahankara</b><small>Personal jewellery concierge</small></div><span class="cx" id="chatClose">&times;</span></div>'+
+      '<div class="chat-body" id="chatBody"></div>'+
+      '<div class="chat-chips" id="chatChips"></div>'+
+      '<form class="chat-input" id="chatForm"><input id="chatInput" placeholder="Ask about a piece, shipping or sizing…" autocomplete="off"><button type="submit">Send</button></form>'+
     '</div>'+
     '<div class="toast" id="toast"></div>';
   }
@@ -537,6 +548,61 @@
   }
 
   // ============================================================
+  //  AHANKARA CONCIERGE (rule-based product chatbot)
+  // ============================================================
+  var chatStarted=false;
+  function chatScroll(){ var b=$("#chatBody"); if(b)b.scrollTop=b.scrollHeight; }
+  function botMsg(html,who){ var b=$("#chatBody"); if(!b)return; var m=document.createElement("div"); m.className="msg "+(who||"bot"); m.innerHTML=html; b.appendChild(m); chatScroll(); }
+  function botProducts(list){ var b=$("#chatBody"); if(!b||!list.length)return; var w=document.createElement("div"); w.className="chat-prods";
+    w.innerHTML=list.map(function(p){var cm=colMeta(p.col); return '<a class="chat-prod" href="product.html?sku='+p.sku+'"><img src="'+CARD+p.img+'.jpg" alt=""><span><b>'+p.name+'</b><span>'+(cm?cm.name:p.sub)+'</span><span class="pp">'+inr(p.price)+'</span></span></a>';}).join("");
+    b.appendChild(w); chatScroll(); }
+  function setChips(arr){ var c=$("#chatChips"); if(!c)return; c.innerHTML=(arr||[]).map(function(t){return '<button type="button" class="chat-chip">'+t+'</button>';}).join(""); }
+  var DEFAULT_CHIPS=["Bridal sets","Temple necklaces","Kemp jhumkas","Shipping","Offers","Talk to a human"];
+
+  function searchProducts(q){
+    var stop={find:1,show:1,me:1,want:1,looking:1,for:1,the:1,some:1,need:1,you:1,have:1,jewellery:1,jewelry:1,piece:1,pieces:1,please:1,under:1,buy:1,any:1,with:1,and:1,something:1,like:1,get:1,can:1,this:1};
+    var cap=null; var mc=q.toLowerCase().match(/under\s*(?:rs\.?|₹|inr)?\s*(\d{3,6})/); if(mc)cap=+mc[1];
+    var toks=q.toLowerCase().replace(/[^a-z0-9 ]/g," ").split(/\s+/).filter(function(t){return t.length>2&&!stop[t];});
+    var list=P;
+    if(cap) list=list.filter(function(p){return p.price<=cap;});
+    if(!toks.length) return cap?list.slice(0,4):[];
+    var scored=list.map(function(p){ var cm=colMeta(p.col); var hay=(p.name+" "+p.sub+" "+(cm?cm.name:"")+" "+p.mat+" "+p.occ+" "+catLabel(p.cat)).toLowerCase();
+      var s=0; toks.forEach(function(t){ if(hay.indexOf(t)>-1)s++; }); return {p:p,s:s}; }).filter(function(x){return x.s>0;});
+    scored.sort(function(a,b){return b.s-a.s || a.p.price-b.p.price;});
+    return scored.slice(0,4).map(function(x){return x.p;});
+  }
+
+  function respond(text){
+    var t=text.toLowerCase();
+    function has(){ for(var i=0;i<arguments.length;i++){ if(t.indexOf(arguments[i])>-1)return true; } return false; }
+    if(has("hi","hello","hey","namaste","namaskar")){ botMsg("Namaste 🙏 Lovely to meet you. Tell me what you're drawn to — a <b>bridal set</b>, <b>temple necklace</b>, <b>jhumkas</b> — or ask me about materials, shipping or sizing."); setChips(DEFAULT_CHIPS); return; }
+    if(has("human","agent","call","whatsapp","speak","talk to")){ botMsg("Of course — our concierge replies quickly on WhatsApp: <a href=\"https://wa.me/919000000000\" target=\"_blank\">Chat on WhatsApp →</a><br>Or write to <a href=\"mailto:hello@ahankaraka.in\">hello@ahankaraka.in</a>."); setChips(DEFAULT_CHIPS); return; }
+    if(has("ship","deliver","dispatch","courier")){ botMsg("We offer <b>complimentary insured shipping across India</b>. In-stock pieces dispatch in 2–4 working days; made-to-order pieces in 2–3 weeks. International shipping is available too. <a href=\"support.html#shipping\">Full details →</a>"); setChips(["Returns","Track my order","Find jewellery"]); return; }
+    if(has("return","refund","exchange")){ botMsg("Easy <b>7-day returns</b> on in-stock pieces. Made-to-order and pierced items are excluded for hygiene. <a href=\"support.html#shipping\">Returns &amp; refunds →</a>"); setChips(["Shipping","Talk to a human"]); return; }
+    if(has("pay","upi","card","cod","cash on","emi","netbank","wallet","razorpay","super.money","gpay")){ botMsg("You can pay by <b>UPI</b> (GPay, PhonePe, Paytm, super.money), <b>credit/debit cards</b> (Visa, Mastercard, RuPay, Amex), net banking, wallets, <b>EMI / Pay-Later</b>, and <b>Cash on Delivery</b> — all secured by Razorpay."); setChips(["Offers","Find jewellery"]); return; }
+    if(has("coupon","discount","offer","promo","code","deal","sale")){ botMsg("A little welcome gift ✦ — use <b>WELCOME500</b> for ₹500 off your first order, or <b>FESTIVE15</b> for 15% off, at checkout."); setChips(["Bridal sets","Temple necklaces"]); return; }
+    if(has("material","real gold","gold","metal","kemp","made of","quality")){ botMsg("Each piece is hand-finished in <b>antique-gold polish</b> over a skin-friendly alloy, set with kemp, CZ or pearl — honestly made, never sold as fine gold. <a href=\"world.html#materials\">Materials &amp; quality →</a>"); setChips(["Care guide","Find jewellery"]); return; }
+    if(has("care","clean","store","tarnish","maintain")){ botMsg("Keep your piece in its pouch, away from moisture &amp; perfume, and wipe gently with a soft cloth. Backed by a 1-year polish warranty. <a href=\"support.html#care\">Care guide →</a>"); setChips(["Materials","Find jewellery"]); return; }
+    if(has("size","sizing","fit","measure","bangle size")){ botMsg("Necklaces &amp; earrings are one-size with adjustable fastenings; bangles come in standard sizes (2.4\"–2.8\"). <a href=\"support.html#size\">Size guide →</a> — or book a <a href=\"contact.html\">styling consultation</a>."); setChips(["Bridal sets","Talk to a human"]); return; }
+    if(has("track","order status","my order","where is")){ botMsg("Your tracking link is in your order confirmation email. If you can't find it, our team will help right away — <a href=\"contact.html\">message us →</a> or WhatsApp us."); setChips(["Talk to a human","Shipping"]); return; }
+    if(has("consult","appointment","book")){ botMsg("We'd love to help in person or virtually — <a href=\"contact.html#consultation\">book a complimentary consultation →</a> for bridal, gifting or bespoke pieces."); setChips(DEFAULT_CHIPS); return; }
+    // collection shortcuts
+    if(has("bridal","wedding","dulhan","marriage")){ botMsg("Our <b>Bridal Maharani</b> collection — complete temple sets, haarams and maang tikkas for the big day:"); botProducts((S.products||[]).filter(function(p){return p.col==="bridal";}).slice(0,4)); botMsg("<a href=\"collection.html?collection=bridal\">View all bridal →</a>"); setChips(["Temple necklaces","Maang tikka","Talk to a human"]); return; }
+    // product search
+    var res=searchProducts(text);
+    if(res.length){ botMsg("Here are some pieces you may love ✦"); botProducts(res); botMsg("Want me to refine by budget or occasion? Just tell me."); setChips(["Under ₹3000","Bridal sets","Kemp jhumkas"]); return; }
+    botMsg("I can help you discover something beautiful — try a style like <b>“temple necklace”</b>, <b>“kemp jhumkas”</b>, <b>“choker”</b> or <b>“bridal set”</b>, or pick one below."); setChips(DEFAULT_CHIPS);
+  }
+
+  function startChat(){ if(chatStarted)return; chatStarted=true;
+    botMsg("Namaste 🙏 I'm <b>Ahankara</b>, your personal concierge. I can help you find the perfect piece, or answer anything about materials, shipping &amp; sizing. What are you looking for today?");
+    setChips(DEFAULT_CHIPS);
+  }
+  function openChat(){ var p=$("#chatPanel"); if(!p)return; p.classList.add("open"); startChat(); setTimeout(function(){var i=$("#chatInput"); if(i)i.focus();},250); }
+  function closeChat(){ var p=$("#chatPanel"); if(p)p.classList.remove("open"); }
+  function chatSend(text){ text=(text||"").trim(); if(!text)return; botMsg(text,"user"); $("#chatInput").value=""; setChips([]); setTimeout(function(){ respond(text); },420); }
+
+  // ============================================================
   //  GLOBAL EVENTS
   // ============================================================
   document.addEventListener("click",function(e){
@@ -556,9 +622,14 @@
     if(e.target.id==="mmClose"){$("#mmenu").classList.remove("open");return;}
     if(e.target.closest(".mmenu a")){$("#mmenu").classList.remove("open");}
     if(e.target.id==="checkoutBtn"){closeCart();location.href="checkout.html";return;}
+    if(e.target.closest("#chatToggle")){ var p=$("#chatPanel"); if(p&&p.classList.contains("open"))closeChat(); else openChat(); return; }
+    if(e.target.id==="chatClose"){ closeChat(); return; }
+    var chip=e.target.closest(".chat-chip"); if(chip){ chatSend(chip.textContent); return; }
+    if(e.target.closest("#filterToggle")){ var fx=$("#facetBox"); if(fx)fx.classList.toggle("open"); return; }
   });
   document.addEventListener("input",function(e){ if(e.target.id==="searchInput")searchRender(e.target.value); });
   document.addEventListener("submit",function(e){
+    if(e.target.id==="chatForm"){ e.preventDefault(); chatSend($("#chatInput").value); return; }
     if(e.target.id==="coForm"){ e.preventDefault(); placeOrder(); return; }
     if(e.target.id==="nlFoot"||e.target.classList.contains("nl-form")){e.preventDefault();e.target.reset();toast("Welcome to the world of AHANKARAKA");}
   });
@@ -572,5 +643,6 @@
     $("#yr")&&($("#yr").textContent="2026");
     paint(); initSlimHeader(); initHero(); initCarousel(); initReveal();
     initHome(); initCollectionsLanding(); initCollection(); initProduct(); renderWishlist(); initCheckout();
+    if(location.hash.indexOf("#chat")===0){ openChat(); var qm=location.hash.split("="); if(qm[1]){ setTimeout(function(){chatSend(decodeURIComponent(qm[1].replace(/\+/g," ")));},500); } }
   });
 })();
