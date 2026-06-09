@@ -591,6 +591,37 @@ h1,h2,h3,h4{font-family:var(--serif);font-weight:500;line-height:1.07;margin:0;l
 .reveal{opacity:0;transform:translateY(28px);transition:.85s cubic-bezier(.2,.7,.3,1)}
 .reveal.in{opacity:1;transform:none}
 
+/* ---------- animated brand motif (intro) ---------- */
+.intro-motif{width:74px;height:74px;margin:0 auto 8px;position:relative}
+.intro-motif img{width:100%;height:100%;animation:spin 26s linear infinite;opacity:.9}
+.intro-motif::after{content:"";position:absolute;inset:-14px;border:1px solid var(--line-2);border-radius:50%;animation:pulse 4s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.08);opacity:.15}}
+@media(prefers-reduced-motion:reduce){.intro-motif img{animation:none}.intro-motif::after{animation:none}}
+
+/* ---------- interactive 3D philosophy ---------- */
+.phil{padding:clamp(60px,9vw,118px) 0;background:var(--deep);position:relative;overflow:hidden}
+.phil .section-head h2,.phil .section-head{color:#fff}
+.phil .section-head p{color:#e7d9c4}
+.phil .eyebrow{color:var(--gold-lt)}
+.phil-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;perspective:1400px}
+.phil-card{position:relative;min-height:460px;border-radius:5px;overflow:hidden;transform-style:preserve-3d;
+  transition:transform .3s cubic-bezier(.2,.7,.3,1),box-shadow .4s;will-change:transform;color:#fff;cursor:default}
+.phil-card .pimg{position:absolute;inset:0;transform:translateZ(0) scale(1.06);transition:transform .6s}
+.phil-card .pimg img{width:100%;height:100%;object-fit:cover}
+.phil-card::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 30%,rgba(28,18,20,.9));z-index:1}
+.phil-card:hover{box-shadow:0 40px 80px -30px rgba(0,0,0,.65)}
+.phil-card:hover .pimg{transform:translateZ(0) scale(1.12)}
+.phil-card .pc{position:absolute;inset:auto 0 0 0;padding:32px;z-index:2;transform:translateZ(55px)}
+.phil-card .num{font-family:var(--serif);font-style:italic;font-size:24px;color:var(--gold-lt);display:block;margin-bottom:8px}
+.phil-card h3{font-size:30px;font-weight:500;margin-bottom:10px}
+.phil-card p{font-size:14.5px;color:#ecdcc8;line-height:1.55;max-width:300px;
+  opacity:0;max-height:0;transform:translateY(8px);transition:.45s;overflow:hidden}
+.phil-card:hover p,.phil-card.tap p{opacity:1;max-height:160px;transform:none}
+.phil-card .glow{position:absolute;width:300px;height:300px;border-radius:50%;pointer-events:none;z-index:2;
+  background:radial-gradient(circle,rgba(216,177,94,.28),transparent 70%);opacity:0;transition:.3s;transform:translate(-50%,-50%)}
+.phil-card:hover .glow{opacity:1}
+
 /* ---------- full-bleed image band ---------- */
 .fullbleed{position:relative;min-height:64vh;background-size:cover;background-position:center 26%;display:flex;align-items:flex-end;justify-content:center}
 .fullbleed::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 42%,rgba(34,24,24,.62))}
@@ -648,7 +679,9 @@ h1,h2,h3,h4{font-family:var(--serif);font-weight:500;line-height:1.07;margin:0;l
   .hnav,.region,.carousel-nav,.m-only-hide{display:none}
   .burger,.m-only{display:grid}
   .htop{grid-template-columns:auto 1fr auto;height:64px}
-  .pillars,.col-grid,.tgrid,.jgrid,.mat-grid,.value-grid{grid-template-columns:1fr}
+  .pillars,.col-grid,.tgrid,.jgrid,.mat-grid,.value-grid,.phil-grid{grid-template-columns:1fr}
+  .phil-card{min-height:400px;transform:none!important}
+  .phil-card p{opacity:1;max-height:170px;transform:none}
   .intro,.band,.band.rev .v,.pdp,.pdp-2col,.jfeature,.contact-grid{grid-template-columns:1fr}
   .band.rev .v{order:0}
   .intro .pic,.band .v{min-height:320px}

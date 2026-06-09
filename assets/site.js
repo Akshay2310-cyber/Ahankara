@@ -7,7 +7,9 @@
   "use strict";
   var S = window.STORE || {};
   var P = S.products || [];
-  var CARD = "assets/img/card/", WEB = "assets/img/web/";
+  var CARD = "assets/img/card/", WEB = "assets/img/web/", PROD = "assets/img/prod/";
+  function imgCard(p){ return p && p.ph ? PROD+p.sku+".jpg" : CARD+p.img+".jpg"; }
+  function imgWeb(p){ return p && p.ph ? PROD+p.sku+".jpg" : WEB+p.img+".jpg"; }
 
   // ---------- utils ----------
   function inr(n){ return "₹" + Number(n).toLocaleString("en-IN"); }
@@ -223,7 +225,7 @@
     var cm = colMeta(p.col);
     return '<article class="pcard" data-sku="'+p.sku+'">'+
       '<div class="media">'+tag+
-        '<a href="product.html?sku='+p.sku+'"><img loading="lazy" src="'+CARD+p.img+'.jpg" alt="'+p.name.replace(/"/g,'')+'"></a>'+
+        '<a href="product.html?sku='+p.sku+'"><img loading="lazy" src="'+imgCard(p)+'" alt="'+p.name.replace(/"/g,'')+'"></a>'+
         '<button class="wish'+onw+'" data-wish="'+p.sku+'" aria-label="Save">'+SVG.heart+'</button>'+
         '<button class="quick" data-quick="'+p.sku+'">Quick View</button>'+
       '</div>'+
@@ -264,7 +266,7 @@
     }
     $("#cartFoot").style.display="block";
     body.innerHTML=keys.map(function(k){var p=byId(k); if(!p)return ""; var cm=colMeta(p.col);
-      return '<div class="citem"><img src="'+CARD+p.img+'.jpg" alt="">'+
+      return '<div class="citem"><img src="'+imgCard(p)+'" alt="">'+
         '<div class="cb"><span class="col">'+(cm?cm.name:p.sub)+'</span><b>'+p.name+'</b>'+
         '<div class="qty"><button data-dec="'+k+'">−</button><span>'+c[k]+'</span><button data-inc="'+k+'">+</button></div></div>'+
         '<div style="text-align:right;display:flex;flex-direction:column;justify-content:space-between"><span class="pr">'+inr(p.price*c[k])+'</span><button class="rm" data-rm="'+k+'">Remove</button></div></div>';
@@ -284,7 +286,7 @@
   function quick(sku){ var p=byId(sku); if(!p)return; var cm=colMeta(p.col);
     var mto = p.avail==="Made to Order";
     $("#modalBox").innerHTML='<button class="mclose" data-modal-close>&times;</button>'+
-      '<div class="mimg"><img src="'+WEB+p.img+'.jpg" alt=""></div>'+
+      '<div class="mimg"><img src="'+imgWeb(p)+'" alt=""></div>'+
       '<div class="minfo"><span class="col">'+(cm?cm.name:p.sub)+'</span><h3>'+p.name+'</h3>'+
         '<div class="price">'+inr(p.price)+'</div>'+
         '<p>A hand-finished '+p.sub.toLowerCase()+' in antique-gold, set with '+p.mat.toLowerCase()+' by our master artisans — made to be worn, and remembered.</p>'+
@@ -333,7 +335,7 @@
         (prods.length>5?'<a class="link-arrow" href="collection.html?cat=all&q='+encodeURIComponent(q)+'" style="margin-top:6px">View all '+prods.length+' results →</a>':'')+
       '</div></div>';
   }
-  function prodRow(p){ return '<a href="product.html?sku='+p.sku+'"><img src="'+CARD+p.img+'.jpg" alt=""><span><b>'+p.name+'</b><br><span>'+inr(p.price)+'</span></span></a>'; }
+  function prodRow(p){ return '<a href="product.html?sku='+p.sku+'"><img src="'+imgCard(p)+'" alt=""><span><b>'+p.name+'</b><br><span>'+inr(p.price)+'</span></span></a>'; }
 
   // ============================================================
   //  HERO / CAROUSEL / REVEAL
@@ -353,6 +355,13 @@
     $all(".reveal").forEach(function(n){io.observe(n);});
   }
   function initSlimHeader(){ var h=$("#hdr"); if(!h)return; window.addEventListener("scroll",function(){h.classList.toggle("slim",window.scrollY>120);}); }
+  function initTilt(){ $all(".phil-card").forEach(function(card){ var max=9;
+    card.addEventListener("pointermove",function(e){ if(e.pointerType==="touch")return; var r=card.getBoundingClientRect();
+      var px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
+      card.style.transform="rotateX("+((py-.5)*-2*max)+"deg) rotateY("+((px-.5)*2*max)+"deg) translateY(-5px)";
+      var g=card.querySelector(".glow"); if(g){ g.style.left=(px*100)+"%"; g.style.top=(py*100)+"%"; } });
+    card.addEventListener("pointerleave",function(){ card.style.transform=""; });
+    card.addEventListener("click",function(){ card.classList.toggle("tap"); }); }); }
 
   // ============================================================
   //  PAGE: HOME
@@ -442,16 +451,17 @@
   function initProduct(){ var host=$("#pdp"); if(!host)return;
     var p=byId(param("sku"))||P[0]; var cm=colMeta(p.col);
     document.title=p.name+" — AHANKARAKA";
-    // gallery images: assigned + a few others for variety
-    var idx=(S.all||[]).indexOf(p.img); var gal=[p.img];
-    for(var k=1;k<4;k++){ gal.push((S.all||[])[(idx+k*7)%(S.all||[]).length]); }
+    // gallery: real product photo (if any) first, then styled model/lifestyle shots
+    var idx=(S.all||[]).indexOf(p.img); var lifestyle=[];
+    for(var k=0;k<3;k++){ lifestyle.push(WEB+(S.all||[])[(idx+1+k*5)%(S.all||[]).length]+".jpg"); }
+    var gal = p.ph ? [PROD+p.sku+".jpg"].concat(lifestyle) : [WEB+p.img+".jpg"].concat(lifestyle);
     var onw=wish().indexOf(p.sku)>-1?" on":"";
     var mto=p.avail==="Made to Order";
     $("#pdpCrumb").innerHTML='<a href="index.html">Home</a><span>/</span><a href="collection.html?collection='+p.col+'">'+(cm?cm.name:"Collection")+'</a><span>/</span><b>'+p.name+'</b>';
     host.innerHTML=
       '<div class="pdp-gallery">'+
-        '<div class="pdp-thumbs">'+gal.map(function(g,i){return '<img class="'+(i===0?"active":"")+'" data-g="'+g+'" src="'+CARD+g+'.jpg" alt="">';}).join("")+'</div>'+
-        '<div class="pdp-main"><img id="pdpMain" src="'+WEB+p.img+'.jpg" alt="'+p.name.replace(/"/g,'')+'"></div>'+
+        '<div class="pdp-thumbs">'+gal.map(function(g,i){return '<img class="'+(i===0?"active":"")+'" data-g="'+g+'" src="'+g+'" alt="">';}).join("")+'</div>'+
+        '<div class="pdp-main"><img id="pdpMain" src="'+gal[0]+'" alt="'+p.name.replace(/"/g,'')+'"></div>'+
       '</div>'+
       '<div class="pdp-info">'+
         '<span class="col">'+(cm?cm.name:p.sub)+'</span>'+
@@ -474,11 +484,11 @@
     if(rel.length<4) rel=rel.concat(P.filter(function(x){return x.cat===p.cat&&x.sku!==p.sku&&rel.indexOf(x)<0;})).slice(0,4);
     var rg=$("#relatedGrid"); if(rg) renderCards(rel,rg);
     // sticky bar fill
-    var sb=$("#stickyBuy"); if(sb){ sb.querySelector(".sb-l").innerHTML='<img src="'+CARD+p.img+'.jpg" alt=""><div><b>'+p.name+'</b><div class="sp">'+inr(p.price)+'</div></div>';
+    var sb=$("#stickyBuy"); if(sb){ sb.querySelector(".sb-l").innerHTML='<img src="'+imgCard(p)+'" alt=""><div><b>'+p.name+'</b><div class="sp">'+inr(p.price)+'</div></div>';
       sb.querySelector("[data-add]").setAttribute("data-add",p.sku);
       window.addEventListener("scroll",function(){ var info=$(".pdp-buy"); if(!info)return; var r=info.getBoundingClientRect(); sb.classList.toggle("show", r.bottom<0); }); }
     // thumb switch
-    host.addEventListener("click",function(e){ var t=e.target.closest("[data-g]"); if(t){ $("#pdpMain").src=WEB+t.dataset.g+".jpg"; $all(".pdp-thumbs img").forEach(function(i){i.classList.toggle("active",i===t);}); }});
+    host.addEventListener("click",function(e){ var t=e.target.closest("[data-g]"); if(t){ $("#pdpMain").src=t.dataset.g; $all(".pdp-thumbs img").forEach(function(i){i.classList.toggle("active",i===t);}); }});
   }
 
   // ============================================================
@@ -505,7 +515,7 @@
     function renderSummary(msg){
       var sub=cartSum(), disc=coDiscount(sub), total=sub-disc;
       var items=keys.map(function(k){ var p=byId(k); if(!p)return ""; var cm=colMeta(p.col);
-        return '<div class="sum-item"><img src="'+CARD+p.img+'.jpg" alt=""><div class="si-b"><b>'+p.name+'</b><span>'+(cm?cm.name:p.sub)+' · Qty '+c[k]+'</span></div><div class="si-p">'+inr(p.price*c[k])+'</div></div>';
+        return '<div class="sum-item"><img src="'+imgCard(p)+'" alt=""><div class="si-b"><b>'+p.name+'</b><span>'+(cm?cm.name:p.sub)+' · Qty '+c[k]+'</span></div><div class="si-p">'+inr(p.price*c[k])+'</div></div>';
       }).join("");
       var discRow=CO.applied?'<div class="sum-row" style="color:var(--gold)"><span>Coupon '+CO.applied.code+'</span><span>− '+inr(disc)+'</span></div>':'';
       sum.innerHTML='<h3>Order Summary</h3>'+items+
@@ -533,15 +543,38 @@
       m.classList.add("active"); var r=m.querySelector('input[type=radio]'); if(r)r.checked=true;
     }); });
   }
+  // Razorpay test key (public, from Razorpay docs) — replace with your live key_id + /api order in production
+  var RZP_KEY = "rzp_test_1DP5mmOlF5G5ag";
   function placeOrder(){
     var sel=$(".pay-method.active .pm-head b"); var method=sel?sel.textContent.trim():"your selected method";
+    var total=coTotal();
+    var isCOD=/cash on delivery/i.test(method);
+    if(isCOD || total<=0 || typeof window.Razorpay==="undefined"){ confirmOrder(method,total,isCOD?null:"DEMO"); return; }
+    var email=(document.querySelector('#coForm input[type=email]')||{}).value||"";
+    var phone=(document.querySelector('#coForm input[type=tel]')||{}).value||"";
+    var name=(document.querySelector('#coForm input[required]')||{}).value||"";
+    var rzp=new window.Razorpay({
+      key:RZP_KEY, amount:Math.round(total*100), currency:"INR",
+      name:"AHANKARAKA", description:"Fine Temple Jewellery",
+      image:location.origin+"/assets/logo/brandmark.svg",
+      theme:{color:"#9c7c3c"},
+      prefill:{ name:name, email:email, contact:phone },
+      notes:{ coupon: CO.applied?CO.applied.code:"none" },
+      handler:function(resp){ confirmOrder("Razorpay ("+method+")", total, resp.razorpay_payment_id); },
+      modal:{ ondismiss:function(){ toast("Payment cancelled — your cart is saved"); } }
+    });
+    rzp.on("payment.failed",function(){ toast("Payment failed — please try another method"); });
+    rzp.open();
+  }
+  function confirmOrder(method,total,payId){
     var ono="AHK"+Math.floor(100000+Math.random()*900000);
-    var paid=inr(coTotal()); var cpn=CO.applied?CO.applied.code:null; CO.applied=null;
+    var paid=inr(total); var cpn=CO.applied?CO.applied.code:null; CO.applied=null;
     localStorage.removeItem(CK); paint();
     var main=$("#coMain");
     if(main){ main.innerHTML='<div class="co-confirm"><div class="tick">'+SVG.check+'</div>'+
       '<span class="eyebrow">Thank You</span><h1>Your order is confirmed</h1>'+
       '<div class="ordno">Order '+ono+' · '+paid+'</div>'+
+      (payId&&payId!=="DEMO"?'<p style="font-size:12px;color:var(--muted);letter-spacing:.06em">Payment ID '+payId+'</p>':'')+
       '<p style="color:var(--ink-2)">A confirmation has been sent to your email. Your pieces will be hand-crafted and dispatched with insured shipping — made-to-order items in 2–3 weeks, in-stock pieces within 2–4 days. Payment via '+method+(cpn?' · coupon '+cpn+' applied':'')+'.</p>'+
       '<div class="mt"><a class="btn btn-fill" href="collections.html">Continue Shopping</a> &nbsp; <a class="btn btn-ghost" href="index.html">Back to Home</a></div></div>';
       window.scrollTo({top:0,behavior:"smooth"}); document.title="Order Confirmed — AHANKARAKA"; }
@@ -554,7 +587,7 @@
   function chatScroll(){ var b=$("#chatBody"); if(b)b.scrollTop=b.scrollHeight; }
   function botMsg(html,who){ var b=$("#chatBody"); if(!b)return; var m=document.createElement("div"); m.className="msg "+(who||"bot"); m.innerHTML=html; b.appendChild(m); chatScroll(); }
   function botProducts(list){ var b=$("#chatBody"); if(!b||!list.length)return; var w=document.createElement("div"); w.className="chat-prods";
-    w.innerHTML=list.map(function(p){var cm=colMeta(p.col); return '<a class="chat-prod" href="product.html?sku='+p.sku+'"><img src="'+CARD+p.img+'.jpg" alt=""><span><b>'+p.name+'</b><span>'+(cm?cm.name:p.sub)+'</span><span class="pp">'+inr(p.price)+'</span></span></a>';}).join("");
+    w.innerHTML=list.map(function(p){var cm=colMeta(p.col); return '<a class="chat-prod" href="product.html?sku='+p.sku+'"><img src="'+imgCard(p)+'" alt=""><span><b>'+p.name+'</b><span>'+(cm?cm.name:p.sub)+'</span><span class="pp">'+inr(p.price)+'</span></span></a>';}).join("");
     b.appendChild(w); chatScroll(); }
   function setChips(arr){ var c=$("#chatChips"); if(!c)return; c.innerHTML=(arr||[]).map(function(t){return '<button type="button" class="chat-chip">'+t+'</button>';}).join(""); }
   var DEFAULT_CHIPS=["Bridal sets","Temple necklaces","Kemp jhumkas","Shipping","Offers","Talk to a human"];
@@ -641,7 +674,7 @@
     var f=$("#ahx-footer"); if(f)f.innerHTML=footerHTML();
     var b=document.createElement("div"); b.innerHTML=overlaysHTML(); while(b.firstChild)document.body.appendChild(b.firstChild);
     $("#yr")&&($("#yr").textContent="2026");
-    paint(); initSlimHeader(); initHero(); initCarousel(); initReveal();
+    paint(); initSlimHeader(); initHero(); initCarousel(); initReveal(); initTilt();
     initHome(); initCollectionsLanding(); initCollection(); initProduct(); renderWishlist(); initCheckout();
     if(location.hash.indexOf("#chat")===0){ openChat(); var qm=location.hash.split("="); if(qm[1]){ setTimeout(function(){chatSend(decodeURIComponent(qm[1].replace(/\+/g," ")));},500); } }
   });
