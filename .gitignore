@@ -5,3 +5,5 @@ _seed.html
 .DS_Store
 node_modules/
 .vercel
+
+.vercel

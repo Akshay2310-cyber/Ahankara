@@ -32,6 +32,23 @@
     leaf:'<svg viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 4 13c0-6 8-9 16-9 0 8-3 16-9 16z"/></svg>'
   };
 
+  // ---------- payment symbols ----------
+  var PAY = {
+    visa:'<svg viewBox="0 0 46 30"><text x="23" y="20" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="bold" font-style="italic" font-size="13" fill="#1a1f71">VISA</text></svg>',
+    mc:'<svg viewBox="0 0 46 30"><circle cx="19" cy="15" r="8" fill="#eb001b"/><circle cx="28" cy="15" r="8" fill="#f79e1b"/><path d="M23.5,9.2a7.98,7.98,0,0,1,0,11.6a7.98,7.98,0,0,1,0-11.6Z" fill="#ff5f00"/></svg>',
+    rupay:'<svg viewBox="0 0 46 30"><text x="23" y="19" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="10"><tspan fill="#1a3a6b">Ru</tspan><tspan fill="#ee7b22">Pay</tspan></text></svg>',
+    amex:'<svg viewBox="0 0 46 30"><rect width="46" height="30" rx="4" fill="#2e77bb"/><text x="23" y="13.5" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="6.2" fill="#fff">AMERICAN</text><text x="23" y="22" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="6.2" fill="#fff">EXPRESS</text></svg>',
+    upi:'<svg viewBox="0 0 46 30"><text x="23" y="13" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="8.5" fill="#3a3a3a">UPI</text><rect x="14" y="17" width="18" height="2.3" fill="#f37021"/><rect x="14" y="20.4" width="18" height="2.3" fill="#0f9d58"/></svg>',
+    gpay:'<svg viewBox="0 0 46 30"><text x="23" y="19" text-anchor="middle" font-family="Arial" font-weight="600" font-size="9.5"><tspan fill="#4285F4">G</tspan><tspan fill="#5f6368"> Pay</tspan></text></svg>',
+    paytm:'<svg viewBox="0 0 46 30"><text x="23" y="19" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="9.5"><tspan fill="#002970">pay</tspan><tspan fill="#20b6e8">tm</tspan></text></svg>',
+    rzp:'<svg viewBox="0 0 46 30"><text x="23" y="19" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="7.4" fill="#0c2451">Razorpay</text></svg>',
+    cod:'<svg viewBox="0 0 46 30"><text x="23" y="19" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="8.5" fill="#3a282a">COD</text></svg>'
+  };
+  function payStrip(){
+    var order=["visa","mc","rupay","amex","upi","gpay","paytm","rzp","cod"];
+    return '<div class="pay-strip">'+order.map(function(k){return '<span class="pay-badge" title="'+k+'">'+PAY[k]+'</span>';}).join("")+'</div>';
+  }
+
   // ============================================================
   //  COMPONENT INJECTION
   // ============================================================
@@ -50,7 +67,7 @@
           '<button class="icon-btn burger m-only" id="burger" aria-label="Menu">'+SVG.menu+'</button>'+
           '<span class="region m-only-hide">India · INR ₹</span>'+
         '</div>'+
-        '<a class="logo" href="index.html" aria-label="AHANKARAKA"><img src="assets/logo/horizontal.svg" alt="AHANKARAKA" style="height:38px;display:block"></a>'+
+        '<a class="logo" href="index.html" aria-label="AHANKARAKA"><img src="assets/logo/horizontal.svg" alt="AHANKARAKA" style="height:52px;display:block"></a>'+
         '<div class="right">'+
           '<button class="icon-btn" id="searchOpen" aria-label="Search">'+SVG.search+'</button>'+
           '<a class="icon-btn m-only-hide" href="wishlist.html" aria-label="Wishlist">'+SVG.heart+'<span class="badge-count" data-wishcount>0</span></a>'+
@@ -102,7 +119,7 @@
         '<form id="nlFoot"><input type="email" placeholder="Your email — for first looks &amp; stories" required><button>Subscribe</button></form>'+
       '</div></div>'+
       '<div class="container"><div class="cols">'+
-        '<div class="fbrand"><a class="logo" href="index.html" aria-label="AHANKARAKA"><img src="assets/logo/horizontal-white.svg" alt="AHANKARAKA" style="height:46px;display:block"></a>'+
+        '<div class="fbrand"><a class="logo" href="index.html" aria-label="AHANKARAKA"><img src="assets/logo/horizontal-white.svg" alt="AHANKARAKA" style="height:58px;display:block"></a>'+
           '<p>Hand-finished temple, kemp &amp; antique-gold jewellery — adornment as a quiet declaration of self.</p>'+
           '<div class="socials">'+
             '<a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6"/></svg></a>'+
@@ -134,6 +151,9 @@
           '<li><a href="tel:+919000000000">+91 90000 00000</a></li>'+
           '<li>The Studio, Chennai</li>'+
           '<li>Mon–Sat · 10–8 IST</li></ul></div>'+
+      '</div></div>'+
+      '<div class="pay-row"><div class="container">'+
+        '<span class="pl">Secure Payments</span>'+payStrip()+
       '</div></div>'+
       '<div class="bottom"><div class="container">'+
         '<span>© <span id="yr">2026</span> AHANKARAKA. Crafted in India.</span>'+
@@ -167,7 +187,7 @@
     '<div class="modal" id="modal"><div class="mscrim" data-modal-close></div><div class="box" id="modalBox"></div></div>'+
     // mobile menu
     '<div class="mmenu" id="mmenu">'+
-      '<div class="mm-head"><img src="assets/logo/horizontal.svg" alt="AHANKARAKA" style="height:28px"><button class="x" id="mmClose">&times;</button></div>'+
+      '<div class="mm-head"><img src="assets/logo/horizontal.svg" alt="AHANKARAKA" style="height:34px"><button class="x" id="mmClose">&times;</button></div>'+
       '<div class="mm-body">'+
         '<details><summary>Collections</summary><div class="sub">'+
           (S.collections||[]).map(function(c){return '<a href="collection.html?collection='+c.id+'">'+c.name+'</a>';}).join("")+
@@ -463,19 +483,40 @@
   // ============================================================
   //  PAGE: CHECKOUT
   // ============================================================
+  var CO = { applied:null };
+  function coDiscount(sub){ if(!CO.applied)return 0; return CO.applied.type==="flat"?Math.min(CO.applied.val,sub):Math.round(sub*CO.applied.val/100); }
+  function coTotal(){ var s=cartSum(); return s-coDiscount(s); }
   function initCheckout(){ var sum=$("#coSummary"); if(!sum)return;
     var c=cart(), keys=Object.keys(c);
     if(!keys.length){ location.replace("collections.html"); return; }
-    var items=keys.map(function(k){ var p=byId(k); if(!p)return ""; var cm=colMeta(p.col);
-      return '<div class="sum-item"><img src="'+CARD+p.img+'.jpg" alt=""><div class="si-b"><b>'+p.name+'</b><span>'+(cm?cm.name:p.sub)+' · Qty '+c[k]+'</span></div><div class="si-p">'+inr(p.price*c[k])+'</div></div>';
-    }).join("");
-    var total=cartSum();
-    sum.innerHTML='<h3>Order Summary</h3>'+items+
-      '<div class="sum-row"><span>Subtotal</span><span>'+inr(total)+'</span></div>'+
-      '<div class="sum-row"><span>Shipping</span><span>Complimentary</span></div>'+
-      '<div class="sum-row"><span>Gift wrapping</span><span>Included</span></div>'+
-      '<div class="sum-row tot"><span>Total</span><b>'+inr(total)+'</b></div>'+
-      '<div class="co-trust"><span>'+SVG.shield+'100% secure, encrypted payment</span><span>'+SVG.ship+'Free insured shipping across India</span><span>'+SVG.check+'Easy 7-day returns</span></div>';
+    var ps=$("#payStrip"); if(ps) ps.innerHTML=payStrip();
+    var COUPONS={ "WELCOME500":{type:"flat",val:500}, "AHANKARA10":{type:"pct",val:10}, "FESTIVE15":{type:"pct",val:15} };
+    function renderSummary(msg){
+      var sub=cartSum(), disc=coDiscount(sub), total=sub-disc;
+      var items=keys.map(function(k){ var p=byId(k); if(!p)return ""; var cm=colMeta(p.col);
+        return '<div class="sum-item"><img src="'+CARD+p.img+'.jpg" alt=""><div class="si-b"><b>'+p.name+'</b><span>'+(cm?cm.name:p.sub)+' · Qty '+c[k]+'</span></div><div class="si-p">'+inr(p.price*c[k])+'</div></div>';
+      }).join("");
+      var discRow=CO.applied?'<div class="sum-row" style="color:var(--gold)"><span>Coupon '+CO.applied.code+'</span><span>− '+inr(disc)+'</span></div>':'';
+      sum.innerHTML='<h3>Order Summary</h3>'+items+
+        '<div class="coupon"><input id="couponInput" placeholder="Coupon code" '+(CO.applied?'value="'+CO.applied.code+'" disabled':'')+'><button type="button" id="applyCoupon">'+(CO.applied?'Remove':'Apply')+'</button></div>'+
+        '<div class="coupon-msg" id="couponMsg">'+(msg||'')+'</div>'+
+        (CO.applied?'':'<div class="coupon-hint">Try <b data-cc="WELCOME500">WELCOME500</b> · <b data-cc="FESTIVE15">FESTIVE15</b></div>')+
+        '<div class="sum-row"><span>Subtotal</span><span>'+inr(sub)+'</span></div>'+discRow+
+        '<div class="sum-row"><span>Shipping</span><span>Complimentary</span></div>'+
+        '<div class="sum-row"><span>Gift wrapping</span><span>Included</span></div>'+
+        '<div class="sum-row tot"><span>Total</span><b>'+inr(total)+'</b></div>'+
+        '<div class="co-trust"><span>'+SVG.shield+'100% secure, encrypted payment</span><span>'+SVG.ship+'Free insured shipping across India</span><span>'+SVG.check+'Easy 7-day returns</span></div>';
+    }
+    renderSummary();
+    sum.addEventListener("click",function(e){
+      var hint=e.target.closest("[data-cc]"); if(hint){ var ci=$("#couponInput"); if(ci)ci.value=hint.getAttribute("data-cc"); }
+      if(e.target.id==="applyCoupon"){
+        if(CO.applied){ CO.applied=null; renderSummary(); return; }
+        var code=(($("#couponInput").value)||"").trim().toUpperCase(); var f=COUPONS[code];
+        if(f){ CO.applied={type:f.type,val:f.val,code:code}; renderSummary('<span style="color:#2e7d32">Applied — '+(f.type==="flat"?inr(f.val)+" off":f.val+"% off")+'.</span>'); }
+        else { renderSummary('<span style="color:#b3261e">'+(code?'“'+code+'” is not a valid code.':'Please enter a code.')+'</span>'); }
+      }
+    });
     $all(".pay-method").forEach(function(m){ m.addEventListener("click",function(){
       $all(".pay-method").forEach(function(x){x.classList.remove("active");});
       m.classList.add("active"); var r=m.querySelector('input[type=radio]'); if(r)r.checked=true;
@@ -484,12 +525,13 @@
   function placeOrder(){
     var sel=$(".pay-method.active .pm-head b"); var method=sel?sel.textContent.trim():"your selected method";
     var ono="AHK"+Math.floor(100000+Math.random()*900000);
+    var paid=inr(coTotal()); var cpn=CO.applied?CO.applied.code:null; CO.applied=null;
     localStorage.removeItem(CK); paint();
     var main=$("#coMain");
     if(main){ main.innerHTML='<div class="co-confirm"><div class="tick">'+SVG.check+'</div>'+
       '<span class="eyebrow">Thank You</span><h1>Your order is confirmed</h1>'+
-      '<div class="ordno">Order '+ono+'</div>'+
-      '<p style="color:var(--ink-2)">A confirmation has been sent to your email. Your pieces will be hand-crafted and dispatched with insured shipping — made-to-order items in 2–3 weeks, in-stock pieces within 2–4 days. Payment via '+method+'.</p>'+
+      '<div class="ordno">Order '+ono+' · '+paid+'</div>'+
+      '<p style="color:var(--ink-2)">A confirmation has been sent to your email. Your pieces will be hand-crafted and dispatched with insured shipping — made-to-order items in 2–3 weeks, in-stock pieces within 2–4 days. Payment via '+method+(cpn?' · coupon '+cpn+' applied':'')+'.</p>'+
       '<div class="mt"><a class="btn btn-fill" href="collections.html">Continue Shopping</a> &nbsp; <a class="btn btn-ghost" href="index.html">Back to Home</a></div></div>';
       window.scrollTo({top:0,behavior:"smooth"}); document.title="Order Confirmed — AHANKARAKA"; }
   }
